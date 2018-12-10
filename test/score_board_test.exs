@@ -17,12 +17,12 @@ defmodule Trivia.ScoreBoardTest do
   end
 
   test "Players are group by difficulty and score (hard to easy)" do
-    expected = [
-      %Game{difficulty: :hard, score: 10, name: "player10"},
-      %Game{difficulty: :hard, score: 4, name: "player5"},
-      %Game{difficulty: :medium, score: 8, name: "player3"},
-      %Game{difficulty: :easy, score: 6, name: "player8"}
-    ]
+    expected = %{
+      hard: [%Game{difficulty: :hard, score: 10, name: "player10"},
+             %Game{difficulty: :hard, score: 4, name: "player5"}],
+      medium: [%Game{difficulty: :medium, score: 8, name: "player3"}],
+      easy: [%Game{difficulty: :easy, score: 6, name: "player8"}]
+    }
     assert ScoreBoard.group() == {:ok, expected}
   end
 end

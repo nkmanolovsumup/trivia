@@ -15,9 +15,8 @@ defmodule Trivia.ScoreBoard do
       |> Enum.sort_by(fn game -> game.score end)
       |> Enum.reverse()
     end
-    all = [sort_by_score.(grouped_by_difficulty[:hard]),
-           sort_by_score.(grouped_by_difficulty[:medium]),
-           sort_by_score.(grouped_by_difficulty[:easy])]
-    {:ok, List.flatten(all)}
+    {:ok, %{hard: sort_by_score.(grouped_by_difficulty[:hard]),
+            medium: sort_by_score.(grouped_by_difficulty[:medium]),
+            easy: sort_by_score.(grouped_by_difficulty[:easy])}}
   end
 end

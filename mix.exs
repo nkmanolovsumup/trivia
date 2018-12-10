@@ -13,7 +13,8 @@ defmodule Trivia.MixProject do
   defp deps do
     [
       {:hackney, "~> 1.14"},
-      {:jason, "~> 1.1"}
+      {:jason, "~> 1.1"},
+      {:poison, "~> 3.1"}
     ]
   end
 
@@ -21,4 +22,3 @@ defmodule Trivia.MixProject do
     [main_module: Trivia.CLI]
   end
 end
-

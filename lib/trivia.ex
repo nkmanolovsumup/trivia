@@ -1,10 +1,26 @@
 defmodule Trivia do
 
+  defmodule Repo do
+    @behaviour GameRepository
+
+    def list!(), do: {:error, :not_implemented}
+    def get_by!(_), do: {:error, :not_implemented}
+    def put!(_), do: :mocked_ok
+    def delete!(_), do: {:error, :not_implemented}
+  end
+
   defmodule CLI do
     def main([number]), do: main([number, "medium"])
 
     def main([number, difficulty | _]) do
-      number = String.to_integer(number)
+      {number, name} = case number do
+        "challenge" -> 
+          name = IO.gets("What is your name? ")
+          {10, String.trim(name)}
+        number -> 
+          number = String.to_integer(number)
+          {number, "undefined"}
+      end
       difficulty = String.to_atom(difficulty)
       for question <- Trivia.fetch(number, difficulty) do
         IO.puts question.question
@@ -18,8 +34,14 @@ defmodule Trivia do
         if Trivia.answer(question, input), do: 10, else: 0
       end
       |> Enum.sum()
+      |> maybe_append(name, difficulty)
       |> IO.inspect
     end
+
+    defp maybe_append(_score, "undefined", _difficulty), do: :ok
+    defp maybe_append(score, name, difficulty), do: 
+      %Game{name: name, score: score, difficulty: difficulty}
+      |> Trivia.Repo.put!()
   end
 
   def fetch(amount, difficulty) do

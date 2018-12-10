@@ -1,7 +1,11 @@
 defmodule FileGameRepository do
   @behaviour GameRepository
 
-  @storage "games.json"
+  @storage Application.get_env(:trivia, :filepath, "games.json")
+
+  def init() do
+    File.write(filepath, Poison.encode!([]), [:write])
+  end
 
   defp filepath do
     [:code.priv_dir(:trivia), @storage]

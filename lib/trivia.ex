@@ -1,7 +1,12 @@
 defmodule Trivia do
 
   defmodule Repo do
-    def append(_, _, _), do: :mocked_ok
+    @behaviour GameRepository
+
+    def list!(), do: {:error, :not_implemented}
+    def get_by!(_), do: {:error, :not_implemented}
+    def put!(_), do: :mocked_ok
+    def delete!(_), do: {:error, :not_implemented}
   end
 
   defmodule CLI do
@@ -33,8 +38,10 @@ defmodule Trivia do
       |> IO.inspect
     end
 
-    defp maybe_append(score, "undefined", difficulty), do: :ok
-    defp maybe_append(score, name, difficulty), do: Trivia.Repo.append(name, score, difficulty)
+    defp maybe_append(_score, "undefined", _difficulty), do: :ok
+    defp maybe_append(score, name, difficulty), do: 
+      %Game{name: name, score: score, difficulty: difficulty}
+      |> Trivia.Repo.put!()
   end
 
   def fetch(amount, difficulty) do

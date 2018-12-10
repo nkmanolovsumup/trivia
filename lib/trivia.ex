@@ -1,10 +1,21 @@
 defmodule Trivia do
 
+  defmodule Repo do
+    def append(_, _, _), do: :mocked_ok
+  end
+
   defmodule CLI do
     def main([number]), do: main([number, "medium"])
 
     def main([number, difficulty | _]) do
-      number = String.to_integer(number)
+      {number, name} = case number do
+        "challenge" -> 
+          name = IO.gets("What is your name? ")
+          {10, String.trim(name)}
+        number -> 
+          number = String.to_integer(number)
+          {number, "undefined"}
+      end
       difficulty = String.to_atom(difficulty)
       for question <- Trivia.fetch(number, difficulty) do
         IO.puts question.question
@@ -18,8 +29,12 @@ defmodule Trivia do
         if Trivia.answer(question, input), do: 10, else: 0
       end
       |> Enum.sum()
+      |> maybe_append(name, difficulty)
       |> IO.inspect
     end
+
+    defp maybe_append(score, "undefined", difficulty), do: :ok
+    defp maybe_append(score, name, difficulty), do: Trivia.Repo.append(name, score, difficulty)
   end
 
   def fetch(amount, difficulty) do

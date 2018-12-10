@@ -1,5 +1,7 @@
 defmodule Trivia do
 
+  alias Trivia.ScoreBoard
+
   defmodule Repo do
     @behaviour GameRepository
 
@@ -14,10 +16,10 @@ defmodule Trivia do
 
     def main([number, difficulty | _]) do
       {number, name} = case number do
-        "challenge" -> 
+        "challenge" ->
           name = IO.gets("What is your name? ")
           {10, String.trim(name)}
-        number -> 
+        number ->
           number = String.to_integer(number)
           {number, "undefined"}
       end
@@ -38,8 +40,25 @@ defmodule Trivia do
       |> IO.inspect
     end
 
+    def main([]) do
+      {:ok, games} = ScoreBoard.group()
+
+      print_games = fn g ->
+        Enum.map(g, fn game ->
+          IO.puts("#{game.name} score: #{game.score}")
+        end)
+      end
+
+    IO.puts("hard:")
+    print_games.(games[:hard])
+    IO.puts("medium:")
+    print_games.(games[:medium])
+    IO.puts("easy:")
+    print_games.(games[:easy])
+  end
+
     defp maybe_append(_score, "undefined", _difficulty), do: :ok
-    defp maybe_append(score, name, difficulty), do: 
+    defp maybe_append(score, name, difficulty), do:
       %Game{name: name, score: score, difficulty: difficulty}
       |> Trivia.Repo.put!()
   end
@@ -47,7 +66,7 @@ defmodule Trivia do
   def fetch(amount, difficulty) do
     url = "https://opentdb.com/api.php?amount=#{amount}&type=multiple&category=9&difficulty=#{difficulty}"
     case :hackney.get(url, [], "", [with_body: true]) do
-      {:ok, 200, _, body} -> 
+      {:ok, 200, _, body} ->
         Jason.decode!(body)["results"]
         |> Enum.map(&create_questions/1)
       _ -> :error
@@ -62,7 +81,7 @@ defmodule Trivia do
                           "incorrect_answers" => incorrect}) do
     answers = Enum.shuffle([correct | incorrect])
     answers = Enum.zip(1..length(answers), answers)
-    %{question: question, 
+    %{question: question,
       answers: answers,
       correct: Enum.find(answers, fn({_idx, answer}) -> answer == correct end)
     }
